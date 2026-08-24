@@ -1,0 +1,58 @@
+name: Publish Wasm
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'SQLite version to publish, must be semver (e.g. 3.53.4)'
+        required: true
+      sign:
+        description: 'Sign the artifact with cosign'
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Prepare the toolchain
+        working-directory: wasm-lib
+        run: ./prepare-ci.sh
+
+      - name: Build SQLite
+        working-directory: wasm-lib
+        run: ./build.sh
+
+      - name: Install ORAS
+        uses: oras-project/setup-oras@v1
+        with:
+          version: '1.2.2'
+
+      - name: Install cosign
+        if: ${{ inputs.sign }}
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v3.1.2'
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push wasm artifact
+        working-directory: wasm-lib
+        run: |
+          oras push \
+            "ghcr.io/roastedroot/sqlite4j-wasm:${{ inputs.version }}" \
+            libsqlite3.wasm:application/wasm
+
+      - name: Sign with cosign
+        if: ${{ inputs.sign }}
+        run: |
+          cosign sign --yes "ghcr.io/roastedroot/sqlite4j-wasm:${{ inputs.version }}"

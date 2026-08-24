@@ -30,9 +30,34 @@ Among the main reasons:
 There are a few steps to achieve the result:
 
   - compile SQLite to [WebAssembly](https://webassembly.org/)
+  - publish the resulting `.wasm` to an OCI registry, and fetch it at build time with [inlay](https://github.com/roastedroot/inlay)
   - translate the SQLite payload to pure Java bytecode using [Endive Compiler](https://endive.run/docs/usage/build-time-compiler)
   - run SQLite similarly to how it's done using JNI in the original JDBC dirver, but all in pure Java
   - ship an extremely small and self contained `jar` that can run wherever the JVM can go!
+
+### The SQLite Wasm artifact
+
+The `.wasm` module is not committed to this repository. It is built by
+[`wasm-lib/build.sh`](wasm-lib/build.sh), published to
+`ghcr.io/roastedroot/sqlite4j-wasm` by the
+[Publish Wasm](.github/workflows/wasm-publish.yml) workflow, and pulled during
+`generate-sources` by `inlay:fetch`. The exact artifact is pinned by digest in
+[`wkg.lock`](wkg.lock), so ordinary builds need no C toolchain and no network beyond
+the registry.
+
+To move to a new SQLite release: run the *Publish Wasm* workflow with the new version,
+bump `<sqlite.wasm.version>` in [`pom.xml`](pom.xml), then refresh the lock with
+
+```sh
+mvn io.roastedroot:inlay-maven-plugin:fetch -Dinlay.update
+```
+
+When iterating on the wasm locally, build it with `wasm-lib/build.sh` and point the
+build at it directly:
+
+```sh
+mvn install -Dinlay.skip -Dsqlite.wasm.file=$PWD/wasm-lib/libsqlite3.wasm
+```
 
 ## Design Decisions
 

@@ -14,6 +14,9 @@
         <junit.version>5.14.4</junit.version>
         <surefire.version>3.5.6</surefire.version>
         <endive.version>1.0.1</endive.version>
+        <inlay.version>0.0.3</inlay.version>
+        <sqlite.wasm.version>3.53.4</sqlite.wasm.version>
+        <sqlite.wasm.file>${project.build.directory}/wasm/libsqlite3.wasm</sqlite.wasm.file>
     </properties>
 
     <licenses>
@@ -151,6 +154,28 @@
             </plugin>
 
             <plugin>
+                <groupId>io.roastedroot</groupId>
+                <artifactId>inlay-maven-plugin</artifactId>
+                <version>${inlay.version}</version>
+                <executions>
+                <execution>
+                    <id>fetch-sqlite-wasm</id>
+                    <goals>
+                        <goal>fetch</goal>
+                    </goals>
+                    <configuration>
+                        <modules>
+                            <module>
+                                <imageRef>ghcr.io/roastedroot/sqlite4j-wasm:${sqlite.wasm.version}</imageRef>
+                                <outputFile>${sqlite.wasm.file}</outputFile>
+                            </module>
+                        </modules>
+                    </configuration>
+                </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>run.endive</groupId>
                 <artifactId>endive-compiler-maven-plugin</artifactId>
                 <version>${endive.version}</version>
@@ -162,7 +187,7 @@
                     </goals>
                     <configuration>
                         <name>io.roastedroot.sqlite4j.SQLiteModule</name>
-                        <wasmFile>${project.basedir}/wasm-lib/libsqlite3.wasm</wasmFile>
+                        <wasmFile>${sqlite.wasm.file}</wasmFile>
                     </configuration>
                 </execution>
                 </executions>

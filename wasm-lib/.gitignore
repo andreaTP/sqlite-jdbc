@@ -3,3 +3,5 @@ binaryen
 sqlite-amalgamation
 *.zip
 *.tar.gz
+libsqlite3.wasm
+libsqlite3-opt.wasm

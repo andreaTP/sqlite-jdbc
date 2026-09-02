@@ -15,12 +15,12 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # mv wasi-sdk-25.0-x86_64-linux wasi-sdk
 # rm wasi-sdk-25.0-x86_64-linux.tar.gz
 
-# Download the latest SQLite amalgamation 3.48.0 as of today
+# Download the latest SQLite amalgamation 3.53.4 as of today
 # rm -rf sqlite-amalgamation
-# wget https://www.sqlite.org/2026/sqlite-amalgamation-3530300.zip
-# unzip sqlite-amalgamation-3530300.zip
-# mv sqlite-amalgamation-3530300 sqlite-amalgamation
-# rm sqlite-amalgamation-3530300.zip
+# wget https://www.sqlite.org/2026/sqlite-amalgamation-3530400.zip
+# unzip sqlite-amalgamation-3530400.zip
+# mv sqlite-amalgamation-3530400 sqlite-amalgamation
+# rm sqlite-amalgamation-3530400.zip
 
 # Download and install Binaryen for optimizations
 # rm -rf binaryen
